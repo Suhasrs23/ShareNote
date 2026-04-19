@@ -24,34 +24,21 @@ export async function createRoom(
 
   if (!name) return { error: 'Room name is required.' }
 
-  // 1. Create the room
-  const { data: room, error } = await supabase
-    .from('rooms')
-    .insert({ name, description, created_by: user.id })
-    .select()
-    .single()
+  // Use SECURITY DEFINER function — bypasses RLS and validates auth.uid() inside Postgres
+  // (Direct INSERT from Next.js server actions sometimes has auth.uid() = null in RLS context)
+  const { data: roomId, error } = await supabase
+    .rpc('create_room', {
+      p_name: name,
+      p_description: description,
+    })
 
-  if (error || !room) {
-    console.error('createRoom error:', error)
-    // Common cause: RLS INSERT policy not yet added in Supabase
-    if (error?.code === '42501') {
-      return { error: 'Permission denied. Make sure you ran the Phase 2 SQL in Supabase.' }
+  if (error || !roomId) {
+    console.error('createRoom rpc error:', JSON.stringify(error, null, 2))
+    return {
+      error: `Failed to create room: ${error?.message ?? 'Unknown error'}`,
     }
-    return { error: error?.message ?? 'Failed to create room. Please try again.' }
-  }
-
-  // 2. Add creator as owner
-  const { error: memberError } = await supabase
-    .from('room_members')
-    .insert({ room_id: room.id, user_id: user.id, role: 'owner' })
-
-  if (memberError) {
-    console.error('room_members insert error:', memberError)
-    // Clean up the orphaned room
-    await supabase.from('rooms').delete().eq('id', room.id)
-    return { error: 'Failed to set up room membership. Please try again.' }
   }
 
   revalidatePath('/dashboard')
-  redirect(`/room/${room.id}`)
+  redirect(`/room/${roomId}`)
 }

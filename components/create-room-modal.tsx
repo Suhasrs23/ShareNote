@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
-import { createRoom } from '@/app/dashboard/actions'
+import { createRoom, type CreateRoomState } from '@/app/dashboard/actions'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -27,12 +27,84 @@ function SubmitButton() {
   )
 }
 
+function RoomForm({ onClose }: { onClose: () => void }) {
+  const [state, action] = useActionState<CreateRoomState, FormData>(createRoom, null)
+
+  return (
+    <div
+      className="w-full max-w-md bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-white">Create a Room</h2>
+          <p className="text-slate-400 text-xs mt-0.5">A room is a private space for your group.</p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-slate-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5"
+          aria-label="Close modal"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Error banner */}
+      {state?.error && (
+        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl px-4 py-3">
+          <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{state.error}</span>
+        </div>
+      )}
+
+      {/* Form */}
+      <form action={action} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="room-name" className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Room Name <span className="text-indigo-400">*</span>
+          </label>
+          <input
+            id="room-name"
+            name="name"
+            type="text"
+            required
+            placeholder="e.g. ML Resources, Weekend Plans"
+            maxLength={60}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="room-description" className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Description <span className="text-slate-600">(optional)</span>
+          </label>
+          <textarea
+            id="room-description"
+            name="description"
+            placeholder="What is this room for?"
+            rows={3}
+            maxLength={200}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all resize-none"
+          />
+        </div>
+
+        <SubmitButton />
+      </form>
+    </div>
+  )
+}
+
 export function CreateRoomModal() {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      {/* Trigger button — used in header and empty state */}
       <button
         id="create-room-btn"
         onClick={() => setOpen(true)}
@@ -44,77 +116,18 @@ export function CreateRoomModal() {
         New Room
       </button>
 
-      {/* Modal backdrop */}
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
-          {/* Modal panel */}
-          <div
-            className="w-full max-w-md bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-white">Create a Room</h2>
-                <p className="text-slate-400 text-xs mt-0.5">
-                  A room is a private space for your group.
-                </p>
-              </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-slate-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5"
-                aria-label="Close modal"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Form */}
-            <form action={createRoom} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="room-name" className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Room Name <span className="text-indigo-400">*</span>
-                </label>
-                <input
-                  id="room-name"
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="e.g. ML Resources, Weekend Plans"
-                  maxLength={60}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="room-description" className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Description <span className="text-slate-600">(optional)</span>
-                </label>
-                <textarea
-                  id="room-description"
-                  name="description"
-                  placeholder="What is this room for?"
-                  rows={3}
-                  maxLength={200}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all resize-none"
-                />
-              </div>
-
-              <SubmitButton />
-            </form>
-          </div>
+          <RoomForm onClose={() => setOpen(false)} />
         </div>
       )}
     </>
   )
 }
 
-// Separate trigger for the empty-state CTA button
 export function CreateRoomCTA() {
   const [open, setOpen] = useState(false)
 
@@ -133,34 +146,7 @@ export function CreateRoomCTA() {
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
-          <div
-            className="w-full max-w-md bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-white">Create a Room</h2>
-                <p className="text-slate-400 text-xs mt-0.5">A room is a private space for your group.</p>
-              </div>
-              <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-white p-1.5 rounded-lg hover:bg-white/5">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form action={createRoom} className="flex flex-col gap-4">
-              <input
-                name="name" type="text" required placeholder="e.g. ML Resources, Weekend Plans"
-                maxLength={60}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all"
-              />
-              <textarea
-                name="description" placeholder="What is this room for?" rows={3} maxLength={200}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all resize-none"
-              />
-              <SubmitButton />
-            </form>
-          </div>
+          <RoomForm onClose={() => setOpen(false)} />
         </div>
       )}
     </>
