@@ -2,23 +2,18 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-export async function joinRoom(roomId: string) {
+export async function joinRoom(inviteCode: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect(`/login?next=/join/${inviteCode}`)
 
-  // Check not already a member
-  const { data: existing } = await supabase
-    .from('room_members')
-    .select('user_id')
-    .eq('room_id', roomId)
-    .eq('user_id', user.id)
-    .single()
+  // Use SECURITY DEFINER function — same auth.uid() fix as createRoom
+  const { data: roomId, error } = await supabase
+    .rpc('join_room', { p_invite_code: inviteCode })
 
-  if (!existing) {
-    await supabase
-      .from('room_members')
-      .insert({ room_id: roomId, user_id: user.id, role: 'member' })
+  if (error || !roomId) {
+    console.error('joinRoom error:', JSON.stringify(error, null, 2))
+    redirect('/dashboard')
   }
 
   redirect(`/room/${roomId}`)

@@ -1,4 +1,5 @@
 import { signInWithGoogle } from './actions'
+import { EmailAuth } from './email-auth'
 
 interface LoginPageProps {
   searchParams: Promise<{ next?: string }>
@@ -16,7 +17,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-violet-600/15 rounded-full blur-3xl" />
       </div>
 
-      <div className="w-full max-w-sm flex flex-col items-center gap-10 relative z-10">
+      <div className="w-full max-w-sm flex flex-col items-center gap-8 relative z-10">
         {/* Logo */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -33,17 +34,26 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </p>
         </div>
 
-        {/* Sign in card */}
-        <div className="w-full bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 flex flex-col gap-4 shadow-xl">
-          <p className="text-xs text-slate-400 text-center uppercase tracking-widest font-medium">Sign in to continue</p>
+        {/* Auth card */}
+        <div className="w-full bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 flex flex-col gap-5 shadow-xl">
 
-          <form action={signInWithGoogle} className="w-full">
-            {/* Pass the next URL through so OAuth comes back to /join/[code] */}
+          {/* Email / Password auth */}
+          <EmailAuth nextUrl={nextUrl} />
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs text-slate-600 uppercase tracking-widest">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          {/* Google OAuth */}
+          <form action={signInWithGoogle}>
             <input type="hidden" name="next" value={nextUrl} />
             <button
               id="google-signin-btn"
               type="submit"
-              className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-semibold py-3.5 px-6 rounded-xl hover:bg-slate-50 active:scale-95 transition-all duration-150 shadow-md hover:shadow-lg"
+              className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-semibold py-3 px-6 rounded-xl hover:bg-slate-50 active:scale-95 transition-all duration-150 shadow-md hover:shadow-lg"
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
