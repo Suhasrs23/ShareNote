@@ -1,11 +1,25 @@
 import { signInWithGoogle } from './actions'
 import { EmailAuth } from './email-auth'
 
+import { Suspense } from 'react'
+
 interface LoginPageProps {
   searchParams: Promise<{ next?: string }>
 }
 
-export default async function LoginPage({ searchParams }: LoginPageProps) {
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+      </main>
+    }>
+      <LoginContent searchParams={searchParams} />
+    </Suspense>
+  )
+}
+
+async function LoginContent({ searchParams }: LoginPageProps) {
   const { next } = await searchParams
   const nextUrl = next || '/dashboard'
 
