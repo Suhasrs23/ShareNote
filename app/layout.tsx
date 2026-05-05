@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'ShareNote',
   },
+};
+
+export const viewport = {
   themeColor: '#0f172a',
 };
 

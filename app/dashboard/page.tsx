@@ -4,6 +4,8 @@ import { signOut } from './actions'
 import { CreateRoomModal, CreateRoomCTA } from '@/components/create-room-modal'
 import { RoomCard } from '@/components/room-card'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

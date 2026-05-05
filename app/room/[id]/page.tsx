@@ -8,6 +8,8 @@ import { EntryFeed } from '@/components/entry-feed'
 import { ScrollToEntry } from '@/components/scroll-to-entry'
 import { Suspense } from 'react'
 
+export const dynamic = 'force-dynamic'
+
 interface RoomPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ topic?: string }>

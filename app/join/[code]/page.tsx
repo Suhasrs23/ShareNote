@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { joinRoom } from './actions'
 
+export const dynamic = 'force-dynamic'
+
 interface JoinPageProps {
   params: Promise<{ code: string }>
 }
