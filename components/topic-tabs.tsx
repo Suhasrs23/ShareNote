@@ -49,21 +49,32 @@ export function TopicTabs({ topics, roomId, currentTopicId }: TopicTabsProps) {
     <div className="flex flex-col gap-0">
       {/* Tabs row */}
       <div className="flex items-center gap-2 px-5 py-3 overflow-x-auto no-scrollbar">
-        {topics.map((t) => (
-          <button
-            key={t.id}
-            id={`topic-tab-${t.id}`}
-            onClick={() => selectTopic(t.id)}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
-              currentTopicId === t.id
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5'
-            }`}
-          >
-            <span>{t.emoji}</span>
-            <span>{t.name}</span>
-          </button>
-        ))}
+        {topics.map((t) => {
+          const isLoading = isPending && loadingTopicId === t.id;
+          return (
+            <button
+              key={t.id}
+              id={`topic-tab-${t.id}`}
+              onClick={() => selectTopic(t.id)}
+              disabled={isPending}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
+                currentTopicId === t.id
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5'
+              } ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
+            >
+              {isLoading ? (
+                <svg className="animate-spin w-3.5 h-3.5 text-current" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <span>{t.emoji}</span>
+              )}
+              <span>{t.name}</span>
+            </button>
+          )
+        })}
 
         {/* Add topic button */}
         {!adding ? (
