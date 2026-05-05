@@ -1,21 +1,22 @@
 # STATE.md — Project State
 
-> **Last Updated**: 2026-03-31
-> **Current Phase**: Phase 1 — Foundation & Auth (PLANNED, ready for execution)
-> **Active Work**: None
+> **Last Updated**: 2026-05-05
+> **Current Phase**: Phase 4 — Polish, Search & PWA
+> **Active Work**: Phase 4 Kickoff
 
 ## Current Position
-- **Phase**: 1
-- **Task**: Planning complete
-- **Status**: Ready for execution
+- **Phase**: 4
+- **Task**: Entry Search & Edit/Delete
+- **Status**: Starting execution
 
 ## Plans Created
 - `.gsd/phases/1/1-PLAN.md` — Scaffold + DB Schema (wave 1)
 - `.gsd/phases/1/2-PLAN.md` — Google OAuth + Auth Home Page (wave 2)
 
 ## Next Steps
-1. User must complete pre-requisites (Supabase project + Google Cloud OAuth credentials)
-2. `/execute 1` — run Plan 1.1 then 1.2
+1. Implement full-text search for entries within a room.
+2. Add Edit and Delete functionality for a user's own entries.
+3. Configure PWA manifest and service worker for mobile installability.
 
 ## Key Decisions Made
 - Mobile-first web app (no native app)

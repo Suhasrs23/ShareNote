@@ -23,9 +23,13 @@ export function TopicTabs({ topics, roomId, currentTopicId }: TopicTabsProps) {
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('📌')
   const [isPending, startTransition] = useTransition()
+  const [loadingTopicId, setLoadingTopicId] = useState<string | null>(null)
 
   function selectTopic(topicId: string) {
-    router.push(`/room/${roomId}?topic=${topicId}`)
+    setLoadingTopicId(topicId)
+    startTransition(() => {
+      router.push(`/room/${roomId}?topic=${topicId}`)
+    })
   }
 
   function handleAdd() {
