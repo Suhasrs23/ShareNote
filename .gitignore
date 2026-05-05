@@ -1,58 +1,42 @@
-# ─── Dependencies ────────────────────────────────────────────────────────────
-node_modules/
-.pnp
-.pnp.js
-.yarn/install-state.gz
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# ─── Next.js ─────────────────────────────────────────────────────────────────
-.next/
-out/
-build/
-dist/
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# ─── Environment Variables ────────────────────────────────────────────────────
-.env
-.env.local
-.env.development
-.env.development.local
-.env.test.local
-.env.production
-.env.production.local
+# testing
+/coverage
 
-# ─── Supabase ────────────────────────────────────────────────────────────────
-.supabase/
+# next.js
+/.next/
+/out/
 
-# ─── Vercel ──────────────────────────────────────────────────────────────────
-.vercel/
+# production
+/build
 
-# ─── OS Files ────────────────────────────────────────────────────────────────
+# misc
 .DS_Store
-Thumbs.db
-Desktop.ini
-ehthumbs.db
+*.pem
 
-# ─── Editor / IDE ────────────────────────────────────────────────────────────
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.cursor/
-
-# ─── Logs ────────────────────────────────────────────────────────────────────
-*.log
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.pnpm-debug.log*
 
-# ─── Testing ─────────────────────────────────────────────────────────────────
-coverage/
-.nyc_output/
+# env files (can opt-in for committing if needed)
+.env*.local
+.env
 
-# ─── Misc ────────────────────────────────────────────────────────────────────
+# vercel
+.vercel
+
+# typescript
 *.tsbuildinfo
 next-env.d.ts
