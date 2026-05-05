@@ -70,7 +70,7 @@ export default async function RoomPage({ params, searchParams }: RoomPageProps) 
       .eq('room_id', id)
       .eq('topic_id', topicId)
       .order('created_at', { ascending: true })
-    entries = (data ?? []) as Entry[]
+    entries = (data ?? []) as unknown as Entry[]
   }
 
   const activeTopic = topics.find(t => t.id === topicId)

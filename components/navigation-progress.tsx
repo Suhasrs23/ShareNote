@@ -50,8 +50,9 @@ function ProgressBar() {
     // Patch pushState so router.push() triggers the bar
     const originalPush = history.pushState.bind(history)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    history.pushState = function (...args: any[]) {
-      originalPush(...args)
+    history.pushState = function (data: any, unused: string, url?: string | URL | null) {
+      // @ts-expect-error - TypeScript's bind() types are sometimes too strict with tuples
+      originalPush(data, unused, url)
       window.dispatchEvent(new Event('nav:start'))
     }
 
