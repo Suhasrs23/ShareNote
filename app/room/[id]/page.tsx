@@ -1,26 +1,31 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import type { JSONContent } from '@tiptap/core'
+import { TopicTabs } from '@/components/topic-tabs'
+import { EntryEditor } from '@/components/entry-editor'
+import { EntryCard } from '@/components/entry-card'
 
 interface RoomPageProps {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ topic?: string }>
 }
 
-export default async function RoomPage({ params }: RoomPageProps) {
+export default async function RoomPage({ params, searchParams }: RoomPageProps) {
   const { id } = await params
+  const { topic: topicId } = await searchParams
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) redirect('/login')
 
-  // Fetch room (RLS auto-enforces membership)
+  // Fetch room — RLS auto-blocks non-members
   const { data: room } = await supabase
     .from('rooms')
-    .select('id, name, description, invite_code, created_by, created_at')
+    .select('id, name, description, invite_code, created_by')
     .eq('id', id)
     .single()
 
-  // Not a member or room doesn't exist
   if (!room) {
     return (
       <main className="min-h-screen bg-slate-950 flex items-center justify-center px-6">
@@ -40,19 +45,38 @@ export default async function RoomPage({ params }: RoomPageProps) {
     )
   }
 
-  // Fetch members with profile info
-  const { data: members } = await supabase
-    .from('room_members')
-    .select('role, joined_at, profiles(id, display_name, avatar_url)')
-    .eq('room_id', id)
+  // Fetch topics, member count, my role — in parallel
+  const [topicsRes, membersRes] = await Promise.all([
+    supabase.from('topics').select('id, name, emoji').eq('room_id', id).order('created_at', { ascending: true }),
+    supabase.from('room_members').select('user_id, role').eq('room_id', id),
+  ])
 
-  const memberCount = members?.length ?? 0
-  const myRole = members?.find(m => (m.profiles as { id: string } | null)?.id === user.id)?.role ?? 'member'
+  const topics = topicsRes.data ?? []
+  const members = membersRes.data ?? []
+  const memberCount = members.length
+  const myRole = members.find(m => m.user_id === user.id)?.role ?? 'member'
+
+  // Fetch entries for the selected topic
+  type Profile = { id: string; display_name: string | null; avatar_url: string | null }
+  type Entry = { id: string; content: JSONContent; created_at: string; created_by: string; profiles: Profile | null }
+  let entries: Entry[] = []
+
+  if (topicId) {
+    const { data } = await supabase
+      .from('entries')
+      .select('id, content, created_at, created_by, profiles(id, display_name, avatar_url)')
+      .eq('room_id', id)
+      .eq('topic_id', topicId)
+      .order('created_at', { ascending: true })
+    entries = (data ?? []) as Entry[]
+  }
+
+  const activeTopic = topics.find(t => t.id === topicId)
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-30 w-full border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col">
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-30 w-full border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
         <div className="max-w-2xl mx-auto flex items-center gap-3 px-5 py-3">
           <Link
             href="/dashboard"
@@ -77,78 +101,73 @@ export default async function RoomPage({ params }: RoomPageProps) {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-5 py-8 flex flex-col gap-6">
-        {/* Room description */}
-        {room.description && (
-          <p className="text-slate-400 text-sm">{room.description}</p>
-        )}
+      {/* ── Topic tabs ── */}
+      <div className="sticky top-[57px] z-20 border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
+        <div className="max-w-2xl mx-auto">
+          <TopicTabs topics={topics} roomId={id} currentTopicId={topicId ?? null} />
+        </div>
+      </div>
 
-        {/* Topics placeholder — Phase 3 */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Topics</h2>
-            <button
-              id="add-topic-btn"
-              disabled
-              className="flex items-center gap-1 text-xs text-slate-600 cursor-not-allowed"
-              title="Topics coming in Phase 3"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add topic
-            </button>
-          </div>
-
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] flex flex-col items-center justify-center py-12 px-6 text-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* ── Content area ── */}
+      <div className="flex-1 max-w-2xl w-full mx-auto px-5 py-6 pb-48 flex flex-col gap-4">
+        {/* No topics yet */}
+        {topics.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <svg className="w-7 h-7 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
             <div>
-              <p className="text-white font-medium text-sm">No topics yet</p>
-              <p className="text-slate-500 text-xs mt-1">Topics let you organize your group&apos;s notes by category.<br />Coming in the next update!</p>
+              <p className="text-white font-semibold">Create your first topic</p>
+              <p className="text-slate-500 text-sm mt-1">
+                Topics organise your notes into categories.<br />
+                Hit <span className="font-semibold text-slate-400">+ Topic</span> above to get started.
+              </p>
             </div>
           </div>
-        </section>
+        )}
 
-        {/* Members section */}
-        <section>
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Members</h2>
-          <div className="flex flex-col gap-2">
-            {members?.map((m, i) => {
-              const profile = m.profiles as { id: string; display_name: string | null; avatar_url: string | null } | null
-              return (
-                <div key={i} className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3">
-                  {profile?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profile.avatar_url} alt={profile.display_name ?? ''} className="w-8 h-8 rounded-full" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center">
-                      <span className="text-indigo-400 text-xs font-bold">
-                        {(profile?.display_name ?? '?').charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">
-                      {profile?.display_name ?? 'Unknown'}
-                      {profile?.id === user.id && <span className="text-slate-500 font-normal"> (you)</span>}
-                    </p>
-                  </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full ${
-                    m.role === 'owner'
-                      ? 'bg-indigo-500/15 text-indigo-400'
-                      : 'bg-slate-700/50 text-slate-400'
-                  }`}>
-                    {m.role}
-                  </span>
-                </div>
-              )
-            })}
+        {/* Topic selected but no entries */}
+        {topicId && topics.length > 0 && entries.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+            <div className="text-3xl">{activeTopic?.emoji ?? '📌'}</div>
+            <div>
+              <p className="text-white font-semibold">{activeTopic?.name ?? 'Topic'}</p>
+              <p className="text-slate-500 text-sm mt-1">No entries yet. Be the first to post something!</p>
+            </div>
           </div>
-        </section>
+        )}
+
+        {/* No topic selected */}
+        {!topicId && topics.length > 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+            <p className="text-slate-500 text-sm">← Select a topic to see its entries</p>
+          </div>
+        )}
+
+        {/* Entries feed */}
+        {entries.length > 0 && (
+          <div className="flex flex-col gap-5">
+            {entries.map((entry) => (
+              <EntryCard
+                key={entry.id}
+                id={entry.id}
+                content={entry.content}
+                createdAt={entry.created_at}
+                author={entry.profiles}
+                isCurrentUser={entry.created_by === user.id}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Sticky entry editor ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-white/5 bg-slate-950/95 backdrop-blur-md">
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <EntryEditor roomId={id} topicId={topicId ?? null} />
+        </div>
       </div>
     </main>
   )

@@ -93,7 +93,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
             <p className="text-white font-medium text-sm mt-0.5">{name}</p>
           </div>
 
-          <form action={joinRoom.bind(null, room.id)}>
+          <form action={joinRoom.bind(null, code)}>
             <button
               id="join-room-btn"
               type="submit"
