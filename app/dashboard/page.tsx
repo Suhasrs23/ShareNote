@@ -4,9 +4,21 @@ import { signOut } from './actions'
 import { CreateRoomModal, CreateRoomCTA } from '@/components/create-room-modal'
 import { RoomCard } from '@/components/room-card'
 
-export const dynamic = 'force-dynamic'
+import { Suspense } from 'react'
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+      </main>
+    }>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+async function DashboardContent() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

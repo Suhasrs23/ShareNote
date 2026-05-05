@@ -1,14 +1,25 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { joinRoom } from './actions'
-
-export const dynamic = 'force-dynamic'
+import { Suspense } from 'react'
 
 interface JoinPageProps {
   params: Promise<{ code: string }>
 }
 
-export default async function JoinPage({ params }: JoinPageProps) {
+export default function JoinPage({ params }: JoinPageProps) {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+      </main>
+    }>
+      <JoinContent params={params} />
+    </Suspense>
+  )
+}
+
+async function JoinContent({ params }: JoinPageProps) {
   const { code } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

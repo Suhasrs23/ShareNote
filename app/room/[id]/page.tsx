@@ -8,14 +8,24 @@ import { EntryFeed } from '@/components/entry-feed'
 import { ScrollToEntry } from '@/components/scroll-to-entry'
 import { Suspense } from 'react'
 
-export const dynamic = 'force-dynamic'
-
 interface RoomPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ topic?: string }>
 }
 
-export default async function RoomPage({ params, searchParams }: RoomPageProps) {
+export default function RoomPage({ params, searchParams }: RoomPageProps) {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+      </main>
+    }>
+      <RoomContent params={params} searchParams={searchParams} />
+    </Suspense>
+  )
+}
+
+async function RoomContent({ params, searchParams }: RoomPageProps) {
   const { id } = await params
   const { topic: topicId } = await searchParams
 
