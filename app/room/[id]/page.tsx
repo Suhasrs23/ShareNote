@@ -4,7 +4,9 @@ import Link from 'next/link'
 import type { JSONContent } from '@tiptap/core'
 import { TopicTabs } from '@/components/topic-tabs'
 import { EntryEditor } from '@/components/entry-editor'
-import { EntryCard } from '@/components/entry-card'
+import { EntryFeed } from '@/components/entry-feed'
+import { ScrollToEntry } from '@/components/scroll-to-entry'
+import { Suspense } from 'react'
 
 interface RoomPageProps {
   params: Promise<{ id: string }>
@@ -109,7 +111,7 @@ export default async function RoomPage({ params, searchParams }: RoomPageProps) 
       </div>
 
       {/* ── Content area ── */}
-      <div className="flex-1 max-w-2xl w-full mx-auto px-5 py-6 pb-48 flex flex-col gap-4">
+      <div className="flex-1 max-w-2xl w-full mx-auto px-5 py-6 pb-64 flex flex-col gap-4">
         {/* No topics yet */}
         {topics.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
@@ -148,17 +150,16 @@ export default async function RoomPage({ params, searchParams }: RoomPageProps) 
 
         {/* Entries feed */}
         {entries.length > 0 && (
-          <div className="flex flex-col gap-5">
-            {entries.map((entry) => (
-              <EntryCard
-                key={entry.id}
-                id={entry.id}
-                content={entry.content}
-                createdAt={entry.created_at}
-                author={entry.profiles}
-                isCurrentUser={entry.created_by === user.id}
-              />
-            ))}
+          <div>
+            <Suspense fallback={null}>
+              <ScrollToEntry />
+            </Suspense>
+            <EntryFeed
+              entries={entries}
+              currentUserId={user.id}
+              roomId={id}
+              topicId={topicId!}
+            />
           </div>
         )}
       </div>

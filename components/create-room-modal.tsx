@@ -1,6 +1,7 @@
 'use client'
-import { useState, useActionState } from 'react'
+import { useState, useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
+import { createPortal } from 'react-dom'
 import { createRoom, type CreateRoomState } from '@/app/dashboard/actions'
 
 function SubmitButton() {
@@ -100,6 +101,31 @@ function RoomForm({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── Portal modal — renders directly into document.body to escape stacking contexts ──
+function Modal({ onClose }: { onClose: () => void }) {
+  // Close on Escape key
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKey)
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <RoomForm onClose={onClose} />
+    </div>,
+    document.body
+  )
+}
+
 export function CreateRoomModal() {
   const [open, setOpen] = useState(false)
 
@@ -115,15 +141,7 @@ export function CreateRoomModal() {
         </svg>
         New Room
       </button>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
-          <RoomForm onClose={() => setOpen(false)} />
-        </div>
-      )}
+      {open && <Modal onClose={() => setOpen(false)} />}
     </>
   )
 }
@@ -140,15 +158,7 @@ export function CreateRoomCTA() {
       >
         Create your first room
       </button>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
-          <RoomForm onClose={() => setOpen(false)} />
-        </div>
-      )}
+      {open && <Modal onClose={() => setOpen(false)} />}
     </>
   )
 }

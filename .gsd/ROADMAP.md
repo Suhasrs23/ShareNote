@@ -1,23 +1,23 @@
 # ROADMAP.md — ShareNote
 
-> **Current Phase**: Not started
+> **Current Phase**: Phase 4 — Polish, Search & PWA
 > **Milestone**: v1.0 — Private Shared Notepad MVP
 
 ## Must-Haves (from SPEC)
 
-- [ ] Google OAuth login
-- [ ] Create and join Rooms (invite-link based)
-- [ ] Create Topics inside a Room
-- [ ] Add entries with rich-linked text (Slack-style inline hyperlinks)
-- [ ] Show: who shared, when shared, which topic
-- [ ] Private rooms — members only
+- [x] Google OAuth login
+- [x] Create and join Rooms (invite-link based)
+- [x] Create Topics inside a Room
+- [x] Add entries with rich-linked text (Slack-style inline hyperlinks)
+- [x] Show: who shared, when shared, which topic
+- [x] Private rooms — members only
 
 ---
 
 ## Phases
 
 ### Phase 1: Foundation & Auth
-**Status**: ⬜ Not Started
+**Status**: ✅ Completed
 **Objective**: Scaffold the project, set up database, and implement Google OAuth login. Users can log in/out and see their identity.
 **Deliverables**:
 - Next.js project (mobile-first, App Router)
@@ -28,7 +28,7 @@
 ---
 
 ### Phase 2: Rooms & Membership
-**Status**: ⬜ Not Started
+**Status**: ✅ Completed
 **Objective**: Users can create Rooms, get a shareable invite link, and others can join using that link.
 **Deliverables**:
 - Create Room flow (name + optional description)
@@ -40,7 +40,7 @@
 ---
 
 ### Phase 3: Topics & Entries
-**Status**: ⬜ Not Started
+**Status**: ✅ Completed
 **Objective**: Inside a Room, users can create Topics and add rich-linked notes/entries under each Topic.
 **Deliverables**:
 - Topic creation (custom name, emoji/icon optional)
@@ -52,7 +52,7 @@
 ---
 
 ### Phase 4: Polish, Search & PWA
-**Status**: ⬜ Not Started
+**Status**: 🔵 In Progress
 **Objective**: Make it feel like a real app. Add search, mobile PWA install prompt, and polish the UI.
 **Deliverables**:
 - Full-text search across entries in a room
