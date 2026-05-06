@@ -1,5 +1,11 @@
+import { Metadata } from 'next'
 import { signInWithGoogle } from './actions'
 import { EmailAuth } from './email-auth'
+
+export const metadata: Metadata = {
+  title: 'Login',
+  description: 'Sign in to ShareNote to access your shared links and notes.',
+}
 
 import { Suspense } from 'react'
 
