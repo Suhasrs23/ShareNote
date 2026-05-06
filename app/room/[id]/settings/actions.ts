@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function approveJoinRequest(requestId: string, roomId: string) {
+export async function approveJoinRequest(requestId: string, roomId: string, _formData: FormData) {
   const supabase = await createClient()
 
   // The RPC will handle checking if the caller is the owner
@@ -11,15 +11,14 @@ export async function approveJoinRequest(requestId: string, roomId: string) {
 
   if (error) {
     console.error('approve_join_request error:', JSON.stringify(error, null, 2))
-    return { error: 'Failed to approve request' }
+    return
   }
 
   revalidatePath(`/room/${roomId}/settings`)
   revalidatePath(`/room/${roomId}`)
-  return { success: true }
 }
 
-export async function rejectJoinRequest(requestId: string, roomId: string) {
+export async function rejectJoinRequest(requestId: string, roomId: string, _formData: FormData) {
   const supabase = await createClient()
 
   // The RPC will handle checking if the caller is the owner
@@ -27,11 +26,10 @@ export async function rejectJoinRequest(requestId: string, roomId: string) {
 
   if (error) {
     console.error('reject_join_request error:', JSON.stringify(error, null, 2))
-    return { error: 'Failed to reject request' }
+    return
   }
 
   revalidatePath(`/room/${roomId}/settings`)
-  return { success: true }
 }
 
 export async function updateRoom(roomId: string, formData: FormData) {
