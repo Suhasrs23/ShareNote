@@ -48,13 +48,22 @@ export async function signUpWithEmail(
 ): Promise<AuthState> {
   const email = (formData.get('email') as string)?.trim()
   const password = formData.get('password') as string
+  const name = (formData.get('name') as string)?.trim()
   const next = (formData.get('next') as string) || '/dashboard'
 
-  if (!email || !password) return { error: 'Email and password are required.' }
+  if (!email || !password || !name) return { error: 'Email, password, and name are required.' }
   if (password.length < 6) return { error: 'Password must be at least 6 characters.' }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({ email, password })
+  const { error } = await supabase.auth.signUp({ 
+    email, 
+    password,
+    options: {
+      data: {
+        full_name: name,
+      }
+    }
+  })
 
   if (error) return { error: error.message }
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { signOut } from './actions'
 import { CreateRoomModal, CreateRoomCTA } from '@/components/create-room-modal'
 import { RoomCard } from '@/components/room-card'
@@ -71,10 +72,16 @@ async function DashboardContent() {
 
           <div className="flex items-center gap-3">
             <CreateRoomModal />
-            {avatar && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatar} alt={name} className="w-8 h-8 rounded-full ring-2 ring-white/10" />
-            )}
+            <Link href="/dashboard/profile" className="flex items-center gap-2 group hover:bg-white/5 p-1 rounded-lg transition-colors">
+              {avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatar} alt={name} className="w-8 h-8 rounded-full ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500/30 to-violet-600/30 ring-2 ring-white/10 group-hover:ring-indigo-500/50 flex items-center justify-center transition-all">
+                  <span className="text-xs font-bold text-indigo-300">{firstName.charAt(0).toUpperCase()}</span>
+                </div>
+              )}
+            </Link>
             <form action={signOut}>
               <button
                 id="sign-out-btn"
