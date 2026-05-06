@@ -7,14 +7,15 @@ export async function joinRoom(inviteCode: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?next=/join/${inviteCode}`)
 
-  // Use SECURITY DEFINER function — same auth.uid() fix as createRoom
+  // Use SECURITY DEFINER function to request to join
   const { data: roomId, error } = await supabase
-    .rpc('join_room', { p_invite_code: inviteCode })
+    .rpc('request_join_room', { p_invite_code: inviteCode })
 
   if (error || !roomId) {
-    console.error('joinRoom error:', JSON.stringify(error, null, 2))
+    console.error('request_join_room error:', JSON.stringify(error, null, 2))
     redirect('/dashboard')
   }
 
-  redirect(`/room/${roomId}`)
+  // Redirect to dashboard with pending status
+  redirect(`/dashboard?pending=${roomId}`)
 }

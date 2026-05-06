@@ -59,14 +59,16 @@ async function RoomContent({ params, searchParams }: RoomPageProps) {
     )
   }
 
-  // Fetch topics, member count, my role — in parallel
-  const [topicsRes, membersRes] = await Promise.all([
+  // Fetch topics, member count, my role, and pending request count — in parallel
+  const [topicsRes, membersRes, pendingRes] = await Promise.all([
     supabase.from('topics').select('id, name, emoji').eq('room_id', id).order('created_at', { ascending: true }),
     supabase.from('room_members').select('user_id, role').eq('room_id', id),
+    supabase.from('room_join_requests').select('id', { count: 'exact', head: true }).eq('room_id', id).eq('status', 'pending')
   ])
 
   const topics = topicsRes.data ?? []
   const members = membersRes.data ?? []
+  const pendingCount = pendingRes.count ?? 0
   const memberCount = members.length
   const myRole = members.find(m => m.user_id === user.id)?.role ?? 'member'
 
@@ -105,6 +107,25 @@ async function RoomContent({ params, searchParams }: RoomPageProps) {
             <h1 className="font-bold text-white truncate">{room.name}</h1>
             <p className="text-xs text-slate-500">{memberCount} member{memberCount !== 1 ? 's' : ''}</p>
           </div>
+
+          {/* Members / Settings Link (Owner only) */}
+          {myRole === 'owner' && (
+            <Link
+              href={`/room/${id}/settings`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 relative"
+            >
+              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span className="text-sm font-medium text-slate-300 hidden sm:inline">Settings</span>
+              {pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-amber-950">
+                  {pendingCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
             myRole === 'owner'
               ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20'
