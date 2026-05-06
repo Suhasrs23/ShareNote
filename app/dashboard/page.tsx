@@ -40,11 +40,19 @@ async function DashboardContent() {
     .select('room_id, role')
     .eq('user_id', user.id)
 
+  // Fetch user's pending requests
+  const { data: pendingRequests } = await supabase
+    .from('room_join_requests')
+    .select('room_id')
+    .eq('user_id', user.id)
+    .eq('status', 'pending')
+
   const roleMap = new Map(memberships?.map(m => [m.room_id, m.role as 'owner' | 'member']) ?? [])
+  pendingRequests?.forEach(r => roleMap.set(r.room_id, 'pending' as any))
 
   const roomsWithRole = (rooms ?? []).map(r => ({
     ...r,
-    role: roleMap.get(r.id) ?? 'member' as 'owner' | 'member',
+    role: roleMap.get(r.id) ?? 'member',
   }))
 
   return (

@@ -7,7 +7,7 @@ interface RoomCardProps {
   name: string
   description: string | null
   inviteCode: string
-  role: 'owner' | 'member'
+  role: 'owner' | 'member' | 'pending'
   createdAt: string
 }
 
@@ -37,31 +37,35 @@ export function RoomCard({ id, name, description, inviteCode, role }: RoomCardPr
         <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
           role === 'owner'
             ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20'
+            : role === 'pending'
+            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
             : 'bg-slate-700/50 text-slate-400 border border-slate-700'
         }`}>
           {role}
         </span>
-        <button
-          onClick={copyInviteLink}
-          title="Copy invite link"
-          className="flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-400 transition-colors"
-        >
-          {copied ? (
-            <>
-              <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-green-400">Copied!</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-              Invite
-            </>
-          )}
-        </button>
+        {role !== 'pending' && (
+          <button
+            onClick={copyInviteLink}
+            title="Copy invite link"
+            className="flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-400 transition-colors"
+          >
+            {copied ? (
+              <>
+                <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-green-400">Copied!</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                Invite
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Room info */}
@@ -76,11 +80,11 @@ export function RoomCard({ id, name, description, inviteCode, role }: RoomCardPr
 
       {/* Enter link */}
       <button
-        onClick={handleOpen}
+        onClick={role === 'pending' ? undefined : handleOpen}
         id={`enter-room-${id}`}
-        disabled={isPending}
+        disabled={isPending || role === 'pending'}
         className={`flex items-center justify-between pt-3 border-t border-white/5 text-xs transition-colors group/link ${
-          isPending ? 'text-indigo-400 cursor-wait opacity-80' : 'text-slate-500 hover:text-indigo-400'
+          isPending ? 'text-indigo-400 cursor-wait opacity-80' : role === 'pending' ? 'text-amber-500/70 cursor-not-allowed' : 'text-slate-500 hover:text-indigo-400'
         }`}
       >
         <span className="flex items-center gap-2">
@@ -92,11 +96,13 @@ export function RoomCard({ id, name, description, inviteCode, role }: RoomCardPr
               </svg>
               Opening…
             </>
+          ) : role === 'pending' ? (
+            'Pending approval'
           ) : (
             'Open room'
           )}
         </span>
-        {!isPending && (
+        {!isPending && role !== 'pending' && (
           <svg className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

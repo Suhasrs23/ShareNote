@@ -7,6 +7,7 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import { deleteEntry, updateEntry } from '@/app/room/[id]/actions'
+import { LinkPreview } from './link-preview'
 
 interface EntryCardProps {
   id: string
@@ -36,6 +37,37 @@ function getInitialHtml(content: JSONContent): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const c = content as any
   return c.type === 'html' ? (c.html as string) : ''
+}
+
+function extractUrls(content: JSONContent): string[] {
+  const urls = new Set<string>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c = content as any
+
+  if (c.type === 'html' && typeof c.html === 'string') {
+    const regex = /<a[^>]+href=["'](https?:\/\/[^"']+)["']/gi
+    let match
+    while ((match = regex.exec(c.html)) !== null) {
+      if (match[1]) urls.add(match[1])
+    }
+  } else {
+    // Legacy JSON format traversal
+    const traverse = (node: JSONContent) => {
+      if (node.marks) {
+        for (const mark of node.marks) {
+          if (mark.type === 'link' && mark.attrs?.href) {
+            urls.add(mark.attrs.href as string)
+          }
+        }
+      }
+      if (node.content) {
+        node.content.forEach(traverse)
+      }
+    }
+    traverse(content)
+  }
+
+  return Array.from(urls)
 }
 
 // ── Custom link bubble (Slack-style) ──
@@ -296,8 +328,13 @@ export function EntryCard({ id, content, createdAt, author, isCurrentUser, roomI
           <EditMode entryId={id} roomId={roomId} initialHtml={getInitialHtml(content)}
             onCancel={() => setIsEditing(false)} onSaved={() => { setIsEditing(false); router.refresh() }} />
         ) : (
-          <div className="bg-white/[0.04] border border-white/[0.07] rounded-xl rounded-tl-sm px-4 py-3 hover:border-white/10 transition-colors">
-            <EntryContent content={content} />
+          <div className="flex flex-col gap-2">
+            <div className="bg-white/[0.04] border border-white/[0.07] rounded-xl rounded-tl-sm px-4 py-3 hover:border-white/10 transition-colors">
+              <EntryContent content={content} />
+            </div>
+            {extractUrls(content).map((url) => (
+              <LinkPreview key={url} url={url} />
+            ))}
           </div>
         )}
       </div>

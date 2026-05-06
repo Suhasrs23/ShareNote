@@ -5,7 +5,10 @@ import { headers } from 'next/headers'
 
 export async function signInWithGoogle(formData: FormData) {
   const supabase = await createClient()
-  const origin = (await headers()).get('origin')
+  const headersList = await headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || (host?.includes('localhost') ? 'http' : 'https')
+  const origin = `${protocol}://${host}`
   const next = (formData.get('next') as string) || '/dashboard'
 
   const { data, error } = await supabase.auth.signInWithOAuth({

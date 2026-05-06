@@ -66,6 +66,17 @@ async function JoinContent({ params }: JoinPageProps) {
     redirect(`/room/${room.id}`)
   }
 
+  // Check if there is a pending request
+  const { data: pendingReq } = await supabase
+    .from('room_join_requests')
+    .select('status')
+    .eq('room_id', room.id)
+    .eq('user_id', user.id)
+    .eq('status', 'pending')
+    .single()
+
+  const isPending = !!pendingReq;
+
   const name = user.user_metadata?.full_name ?? user.email ?? 'You'
 
   return (
@@ -106,15 +117,27 @@ async function JoinContent({ params }: JoinPageProps) {
             <p className="text-white font-medium text-sm mt-0.5">{name}</p>
           </div>
 
-          <form action={joinRoom.bind(null, code)}>
-            <button
-              id="join-room-btn"
-              type="submit"
-              className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold rounded-xl transition-all duration-150 shadow-lg shadow-indigo-500/20"
-            >
-              Join Room →
-            </button>
-          </form>
+          {isPending ? (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-amber-400 font-medium text-sm">Request Pending</p>
+              </div>
+              <p className="text-amber-400/80 text-xs">Waiting for the owner to approve your request.</p>
+            </div>
+          ) : (
+            <form action={joinRoom.bind(null, code)}>
+              <button
+                id="join-room-btn"
+                type="submit"
+                className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold rounded-xl transition-all duration-150 shadow-lg shadow-indigo-500/20"
+              >
+                Request to Join →
+              </button>
+            </form>
+          )}
         </div>
 
         <a href="/dashboard" className="text-slate-600 text-xs hover:text-slate-400 transition-colors">
