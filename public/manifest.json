@@ -1,7 +1,7 @@
 {
-  "name": "ShareNote",
-  "short_name": "ShareNote",
-  "description": "Your group's shared memory — save links and notes, organised by topic.",
+  "name": "TheDropZone",
+  "short_name": "TheDropZone",
+  "description": "Rescue your group's shared links and media from getting lost in chats.",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0f172a",

@@ -4,21 +4,19 @@ import { ThemeProvider } from "next-themes";
 import { NavigationProgress } from "@/components/navigation-progress";
 import "./globals.css";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl = "https://thedropzone.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "ShareNote — Your group's shared memory",
-    template: "%s | ShareNote"
+    default: "TheDropZone — Your group's shared memory",
+    template: "%s | TheDropZone"
   },
-  description: "A private shared notepad for your group. Save links, notes, and ideas — organized by topic.",
-  keywords: ["shared notes", "group collaboration", "link organizer", "private notepad", "ShareNote"],
-  authors: [{ name: "ShareNote Team" }],
-  creator: "ShareNote",
-  publisher: "ShareNote",
+  description: "A private shared space for your group to rescue links and notes from getting lost in chats.",
+  keywords: ["TheDropZone", "shared links", "group memory", "collaboration", "link organizer", "private notepad"],
+  authors: [{ name: "TheDropZone Team" }],
+  creator: "TheDropZone",
+  publisher: "TheDropZone",
   robots: {
     index: true,
     follow: true,
@@ -35,28 +33,28 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: defaultUrl,
-    title: "ShareNote — Your group's shared memory",
-    description: "A private shared notepad for your group. Save links, notes, and ideas — organized by topic.",
-    siteName: "ShareNote",
+    title: "TheDropZone — Your group's shared memory",
+    description: "A private shared space for your group to rescue links and notes from getting lost in chats.",
+    siteName: "TheDropZone",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "ShareNote Preview",
+        alt: "TheDropZone Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ShareNote — Your group's shared memory",
-    description: "A private shared notepad for your group. Save links, notes, and ideas — organized by topic.",
+    title: "TheDropZone — Your group's shared memory",
+    description: "A private shared space for your group to rescue links and notes from getting lost in chats.",
     images: ["/twitter-image.png"],
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ShareNote',
+    title: 'TheDropZone',
   },
   verification: {
     google: "Ir-sQfR9IuKXNK_gJkjtnR9oUUnET0usn-qavjlteXs",

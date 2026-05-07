@@ -1,6 +1,6 @@
-# 📝 ShareNote
+# 📝 TheDropZone
 
-ShareNote is a private, collaborative platform designed for small groups to organize and store shared links and notes. Built with modern web technologies, it provides a messaging-style interface for topic-organized collaboration.
+TheDropZone is a private, collaborative platform designed for small groups to rescue links, articles, and media from getting lost in chat histories. Built with modern web technologies, it provides a centralized space for topic-organized sharing.
 
 ## ✨ Key Features
 
@@ -31,8 +31,8 @@ ShareNote is a private, collaborative platform designed for small groups to orga
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Suhasrs23/ShareNote.git
-    cd ShareNote
+    git clone https://github.com/Suhasrs23/TheDropZone.git
+    cd TheDropZone
     ```
 
 2.  **Install dependencies:**
@@ -61,7 +61,7 @@ ShareNote is a private, collaborative platform designed for small groups to orga
 
 ## 🛡️ Security
 
-ShareNote implements strict Row Level Security (RLS) policies in Supabase to ensure that:
+TheDropZone implements strict Row Level Security (RLS) policies in Supabase to ensure that:
 - Users can only access rooms they are members of.
 - Room settings and member approvals are restricted to room owners.
 - Profiles are protected but visible to other room members.

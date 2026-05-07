@@ -1,5 +1,5 @@
 -- ============================================================
--- ShareNote Database Schema
+-- TheDropZone Database Schema
 -- Run in: Supabase Dashboard > SQL Editor > New Query > Run
 -- ============================================================
 

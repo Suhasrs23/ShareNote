@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /login
+Disallow: /dashboard/
+Disallow: /room/
+Disallow: /api/
+
+Sitemap: https://thedropzone.vercel.app/sitemap.xml

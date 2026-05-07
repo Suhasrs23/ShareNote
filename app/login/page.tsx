@@ -4,7 +4,7 @@ import { EmailAuth } from './email-auth'
 
 export const metadata: Metadata = {
   title: 'Login',
-  description: 'Sign in to ShareNote to access your shared links and notes.',
+  description: 'Sign in to TheDropZone to rescue your group\'s links and notes.',
 }
 
 import { Suspense } from 'react'
@@ -46,11 +46,11 @@ async function LoginContent({ searchParams }: LoginPageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">ShareNote</h1>
+            <h1 className="text-3xl font-bold text-white tracking-tight">TheDropZone</h1>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed">
-            Your group&apos;s shared memory.<br />
-            Save links & notes, organised by topic.
+            Rescue your group&apos;s shared links and media.<br />
+            Stop losing the good stuff in group chats.
           </p>
         </div>
 
