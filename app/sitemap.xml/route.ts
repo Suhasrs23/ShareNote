@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
-export const revalidate = 86400 // Revalidate once a day
 
 export async function GET() {
   const baseUrl = 'https://thedropzone.vercel.app'
