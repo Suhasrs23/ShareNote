@@ -70,11 +70,16 @@ export function NotificationBell({ roomId }: { roomId: string }) {
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
         })
 
-        await fetch('/api/push/subscribe', {
+        const res = await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription: sub.toJSON() }),
         })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(`Subscribe API failed (${res.status}): ${body.error ?? 'unknown'}`)
+        }
 
         setSubscription(sub)
         setState('granted')
