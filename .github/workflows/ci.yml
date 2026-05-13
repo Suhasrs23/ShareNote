@@ -3,15 +3,27 @@ name: CI
 on:
   push:
     branches:
-      - skills-and-plan-file
+      - main
+      - 'push-notification-feature'
   pull_request:
     branches:
-      - skills-and-plan-file
+      - main
 
 jobs:
-  lint:
-    name: Lint
+  lint-and-build:
+    name: Lint & Build
     runs-on: ubuntu-latest
+
+    env:
+      # Supabase — required for Next.js build (page data collection)
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      # VAPID — required for lib/web-push.ts to initialise at build time
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+      VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+      # Service role — required for admin client
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Checkout code
@@ -28,3 +40,6 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Build
+        run: npm run build
