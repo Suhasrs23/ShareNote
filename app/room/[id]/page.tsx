@@ -6,6 +6,7 @@ import { TopicTabs } from '@/components/topic-tabs'
 import { EntryEditor } from '@/components/entry-editor'
 import { EntryFeed } from '@/components/entry-feed'
 import { ScrollToEntry } from '@/components/scroll-to-entry'
+import { NotificationBell } from '@/components/notification-bell'
 import { Suspense } from 'react'
 
 interface RoomPageProps {
@@ -125,6 +126,8 @@ async function RoomContent({ params, searchParams }: RoomPageProps) {
               )}
             </Link>
           )}
+
+          <NotificationBell roomId={id} />
 
           <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
             myRole === 'owner'
