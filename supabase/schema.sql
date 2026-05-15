@@ -17,6 +17,10 @@ create table public.profiles (
 );
 alter table public.profiles enable row level security;
 
+grant select on public.profiles to anon;
+grant select, insert, update, delete on public.profiles to authenticated;
+grant select, insert, update, delete on public.profiles to service_role;
+
 create policy "Users can view their own profile" on public.profiles
   for select using (auth.uid() = id);
 
@@ -54,6 +58,10 @@ create table public.rooms (
 );
 alter table public.rooms enable row level security;
 
+grant select on public.rooms to anon;
+grant select, insert, update, delete on public.rooms to authenticated;
+grant select, insert, update, delete on public.rooms to service_role;
+
 -- ============================================================
 -- ROOM MEMBERS
 -- ============================================================
@@ -65,6 +73,10 @@ create table public.room_members (
   primary key (room_id, user_id)
 );
 alter table public.room_members enable row level security;
+
+grant select on public.room_members to anon;
+grant select, insert, update, delete on public.room_members to authenticated;
+grant select, insert, update, delete on public.room_members to service_role;
 
 -- RLS: rooms are visible only to members of that room
 create policy "Room members can view rooms" on public.rooms
@@ -99,6 +111,10 @@ create table public.topics (
 );
 alter table public.topics enable row level security;
 
+grant select on public.topics to anon;
+grant select, insert, update, delete on public.topics to authenticated;
+grant select, insert, update, delete on public.topics to service_role;
+
 create policy "Room members can view topics" on public.topics
   for select using (
     exists (
@@ -130,6 +146,10 @@ create table public.entries (
   updated_at timestamptz default now()
 );
 alter table public.entries enable row level security;
+
+grant select on public.entries to anon;
+grant select, insert, update, delete on public.entries to authenticated;
+grant select, insert, update, delete on public.entries to service_role;
 
 create policy "Room members can view entries" on public.entries
   for select using (

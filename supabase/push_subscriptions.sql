@@ -15,6 +15,10 @@ create table if not exists public.push_subscriptions (
 
 alter table public.push_subscriptions enable row level security;
 
+grant select on public.push_subscriptions to anon;
+grant select, insert, update, delete on public.push_subscriptions to authenticated;
+grant select, insert, update, delete on public.push_subscriptions to service_role;
+
 -- Only the owning user can read/write their own subscriptions.
 create policy "Users manage own subscriptions"
   on public.push_subscriptions

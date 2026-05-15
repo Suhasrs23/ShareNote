@@ -15,6 +15,10 @@ create table if not exists public.room_join_requests (
 
 alter table public.room_join_requests enable row level security;
 
+grant select on public.room_join_requests to anon;
+grant select, insert, update, delete on public.room_join_requests to authenticated;
+grant select, insert, update, delete on public.room_join_requests to service_role;
+
 -- 2. RLS Policies
 create policy "Users can view their own requests" on public.room_join_requests
   for select using (user_id = auth.uid());
